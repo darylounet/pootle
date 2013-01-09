@@ -214,7 +214,7 @@ class TranslationProject(models.Model):
         for store in stores.iterator():
             store.sync(update_translation=True,
                        update_structure=not conservative,
-                       conservative=conservative, create=False,
+                       conservative=conservative, create=True,
                        skip_missing=skip_missing,
                        modified_since=modified_since)
 

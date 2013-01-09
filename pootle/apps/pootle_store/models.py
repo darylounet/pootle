@@ -867,7 +867,7 @@ class Store(models.Model, base.TranslationStore):
     abs_real_path = property(_get_abs_real_path)
 
     def _get_real_path(self):
-        return self.file.name
+        return os.path.relpath(self.file.name, settings.PODIRECTORY)
 
     real_path = property(_get_real_path)
 
@@ -1190,7 +1190,7 @@ class Store(models.Model, base.TranslationStore):
             self.sync_time >= self.get_mtime()):
             return
 
-        if not self.file:
+        if not self.file or not os.path.exists(self.pootle_path):
             if create:
                 # File doesn't exist let's create it
                 logging.debug(u"Creating file %s", self.pootle_path)
@@ -1199,6 +1199,11 @@ class Store(models.Model, base.TranslationStore):
                 store_path = os.path.join(
                     self.translation_project.abs_real_path, self.name
                 )
+
+                # check & create folder if it doesn't exists
+                if not os.path.exists(self.translation_project.abs_real_path):
+                    os.makedirs(self.translation_project.abs_real_path)
+
                 store = self.convert(storeclass)
                 store.savefile(store_path)
 
